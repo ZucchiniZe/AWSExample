@@ -46,9 +46,13 @@ namespace AWSExample
                 case "rename":
                     await RenameFileInBucket(bucketName: args[1], sourceKey: args[2], destinationKey: args[3]);
                     break;
+                case "read":
+                    await ReadFileInBucket(bucketName: args[1], key: args[2]);
+                    break;
                 default:
                     Console.WriteLine($"ERROR: invalid command {command}, please choose one of the following");
                     Console.WriteLine("usage:");
+                    Console.WriteLine("  read\treads a file `read <bucket> <key>`");
                     Console.WriteLine("  create\tcreates a file `create <bucket> <key> <contents>`");
                     Console.WriteLine("  rename\trenames a file `rename <bucket> <source> <destination>`");
                     Console.WriteLine("  list-bucket\tlists the contents of a bucket `list-bucket <bucket>`");
@@ -103,6 +107,15 @@ namespace AWSExample
             var deleteResponse = await _client.DeleteObjectAsync(bucketName, sourceKey);
             
             Console.WriteLine($"copy = {copyResponse.HttpStatusCode}, delete = {deleteResponse.HttpStatusCode}");
+        }
+
+        private static async Task ReadFileInBucket(string bucketName, string key)
+        {
+            var file = await _client.GetObjectAsync(bucketName, key);
+            var streamReader = new StreamReader(file.ResponseStream);
+            
+            Console.WriteLine($"name: {file.Key}, length: {file.ContentLength}");
+            Console.WriteLine(streamReader.ReadToEnd());
         }
     }
 }
