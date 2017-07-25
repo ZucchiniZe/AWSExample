@@ -38,10 +38,10 @@ namespace AWSExample
                     await ListOwnedBuckets();
                     break;
                 case "create":
-                    await CreateFileInBucket(args[1], args[2], args[3]);
+                    await CreateFileInBucket(bucketName: args[1], key: args[2], contents: args[3]);
                     break;
                 case "list-bucket":
-                    await GetBucketContents(args[1]);
+                    await GetBucketContents(bucketName: args[1]);
                     break;
                 default:
                     Console.WriteLine($"ERROR: invalid command {command}, please choose one of the following");
