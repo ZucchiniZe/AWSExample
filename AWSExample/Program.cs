@@ -43,10 +43,14 @@ namespace AWSExample
                 case "list-bucket":
                     await GetBucketContents(bucketName: args[1]);
                     break;
+                case "rename":
+                    await RenameFileInBucket(bucketName: args[1], sourceKey: args[2], destinationKey: args[3]);
+                    break;
                 default:
                     Console.WriteLine($"ERROR: invalid command {command}, please choose one of the following");
                     Console.WriteLine("usage:");
-                    Console.WriteLine("  create\tcreates a file in the in the config `create <bucket> <key> <contents>`");
+                    Console.WriteLine("  create\tcreates a file `create <bucket> <key> <contents>`");
+                    Console.WriteLine("  rename\trenames a file `rename <bucket> <source> <destination>`");
                     Console.WriteLine("  list-bucket\tlists the contents of a bucket `list-bucket <bucket>`");
                     Console.WriteLine("  list-owned-buckets\tlists the buckets that you own `list-buckets`");
                     break;
@@ -82,6 +86,23 @@ namespace AWSExample
             };
             var response = await _client.PutObjectAsync(request);
             Console.WriteLine($"response statuscode: {response.HttpStatusCode}");
+        }
+
+        private static async Task RenameFileInBucket(string bucketName, string sourceKey, string destinationKey)
+        {
+            var copyRequest = new CopyObjectRequest
+            {
+                SourceBucket = bucketName,
+                SourceKey = sourceKey,
+                DestinationBucket = bucketName,
+                DestinationKey = destinationKey
+            };
+
+            var copyResponse = await _client.CopyObjectAsync(copyRequest);
+
+            var deleteResponse = await _client.DeleteObjectAsync(bucketName, sourceKey);
+            
+            Console.WriteLine($"copy = {copyResponse.HttpStatusCode}, delete = {deleteResponse.HttpStatusCode}");
         }
     }
 }
