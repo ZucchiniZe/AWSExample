@@ -22,12 +22,36 @@ namespace AWSExample
             _config = configBuilder.Build();
 
             _client = _config.GetAWSOptions().CreateServiceClient<IAmazonS3>();
+            
+            // since the aws api is all async we need to have the main method in a async and run it syncronously 
+            Run(args).GetAwaiter().GetResult();
+        }
 
+        private static async Task Run(string[] args)
+        {
             var bucketName = _config["bucketName"];
 
-            ListBuckets().GetAwaiter().GetResult();
-            CreateFileInBucket("test/file.txt", "this is a text file", bucketName).GetAwaiter().GetResult();
-            GetBucketContents(bucketName).GetAwaiter().GetResult();
+            var command = args.Length != 0 ? args[0] : "";
+
+            switch (command)
+            {
+                case "list-buckets":
+                    await ListBuckets();
+                    break;
+                case "create":
+                    await CreateFileInBucket(args[1], args[2], args[3]);
+                    break;
+                case "list-bucket":
+                    await GetBucketContents(args[1]);
+                    break;
+                default:
+                    Console.WriteLine($"ERROR: invalid command {command}, please choose one of the following");
+                    Console.WriteLine("usage:");
+                    Console.WriteLine("  create\tcreates a file in the in the config `create <bucket> <key> <contents>`");
+                    Console.WriteLine("  list-bucket\tlists the contents of a bucket `list-bucket <bucket>`");
+                    Console.WriteLine("  list-buckets\tlists the buckets that you own `list-buckets`");
+                    break;
+            }
         }
 
         private static async Task ListBuckets()
@@ -41,7 +65,7 @@ namespace AWSExample
 
         private static async Task GetBucketContents(string bucketName)
         {
-            Console.WriteLine($"trying to read the contents of {bucketName}");
+            Console.WriteLine($"contents of {bucketName}");
             var response = await _client.ListObjectsAsync(bucketName);
             foreach (var entry in response.S3Objects)
             {
@@ -49,7 +73,7 @@ namespace AWSExample
             }
         }
 
-        private static async Task CreateFileInBucket(string key, string contents, string bucketName)
+        private static async Task CreateFileInBucket(string bucketName, string key, string contents)
         {
             var request = new PutObjectRequest
             {
