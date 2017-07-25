@@ -61,4 +61,7 @@ Here are the steps that I went through to get my project working.
 
 6. Profit, you now have everything you need to interface with the Amazon SDK for .NET!
     
-I have tried to make [Program.cs](Program.cs) as readable as possible to allow for copying.
+I have tried to make my code as readable as possible to allow for copying and learning.
+
+[Program.cs](Program.cs) handles all the client initializations and connecting to the service plus the cli
+[Operations.cs](Operations.cs) handles all of the actual interfacing with the S3 API.
