@@ -1,0 +1,7 @@
+{
+  "AWS": {
+    "Profile": "default",
+    "Region": "us-west-2"
+  },
+  "bucketName": "virtualchemistry-testing"
+}
