@@ -57,4 +57,4 @@ Here are the steps that I went through to get my project working.
 
 5. Profit, you now have everything you need to interface with the Amazon SDK for .NET!
     
-I have tried to make [Program.cs](AWSExample/Program.cs) as readable as possible to allow for copying.
+I have tried to make [Program.cs](Program.cs) as readable as possible to allow for copying.
