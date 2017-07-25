@@ -1,20 +1,20 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Microsoft.Extensions.Configuration;
 
 namespace AWSExample
 {
-    public class Program
+    public static class Program
     {
         private static IAmazonS3 _client;
         private static IConfiguration _config;
 
         public static void Main(string[] args)
         {
-            // get the config file
+            // get the config file and parse it
             var configBuilder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("settings.json");
@@ -29,14 +29,13 @@ namespace AWSExample
 
         private static async Task Run(string[] args)
         {
-            var bucketName = _config["bucketName"];
-
+            // get the first argument or an empty string
             var command = args.Length != 0 ? args[0] : "";
 
             switch (command)
             {
-                case "list-buckets":
-                    await ListBuckets();
+                case "list-owned-buckets":
+                    await ListOwnedBuckets();
                     break;
                 case "create":
                     await CreateFileInBucket(args[1], args[2], args[3]);
@@ -49,12 +48,12 @@ namespace AWSExample
                     Console.WriteLine("usage:");
                     Console.WriteLine("  create\tcreates a file in the in the config `create <bucket> <key> <contents>`");
                     Console.WriteLine("  list-bucket\tlists the contents of a bucket `list-bucket <bucket>`");
-                    Console.WriteLine("  list-buckets\tlists the buckets that you own `list-buckets`");
+                    Console.WriteLine("  list-owned-buckets\tlists the buckets that you own `list-buckets`");
                     break;
             }
         }
 
-        private static async Task ListBuckets()
+        private static async Task ListOwnedBuckets()
         {
             var response = await _client.ListBucketsAsync();
             foreach (var bucket in response.Buckets)
