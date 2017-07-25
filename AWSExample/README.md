@@ -8,7 +8,11 @@ This is arguably the trickest part of integrating with the API.
 
 Here are the steps that I went through to get my project working.
 
-1. Create a IAM user through the aws console.
+1. Install package(s) through nuget
+    * install AWSSDK.Core first
+    * search through nuget for the sub packages
+    * in this example I installed AWSSDK.S3 alongside core to allow me to interface with S3
+2. Create a IAM user through the aws console.
     * go to https://console.aws.amazon.com/iam/home#/users
     * click on `add user`
     * fill in username and select programmatic access
@@ -21,7 +25,7 @@ Here are the steps that I went through to get my project working.
     * click next
     * click "create user"
     * copy down the credentials that are created to a safe place
-2. Add a AWS profile (this was the confusing part)
+3. Add a AWS profile (this was the confusing part)
     * go to `C:\Users\{CURRENT_USER}\.aws` on windows and `~/.aws/credentials` on Linux/macOS
     * create a text file named `credentials`
     * fill it out like so
@@ -30,7 +34,7 @@ Here are the steps that I went through to get my project working.
     aws_access_key_id = <access key>
     aws_secret_access_key = <secret key>
     ```
-3. Make sure your settings are correct in the config file
+4. Make sure your settings are correct in the config file
     * create a `settings.json` and fill it out like so
     ```json
     {
@@ -41,7 +45,7 @@ Here are the steps that I went through to get my project working.
     }
     ```
     * change the region to the region you want to operate in
-4. Start implementing code
+5. Start implementing code
     * generate the configuration with the ASP.NET configurationbuilder
     ```c#
     var configBuilder = new ConfigurationBuilder()
@@ -55,6 +59,6 @@ Here are the steps that I went through to get my project working.
     _client = _config.GetAWSOptions().CreateServiceClient<IAmazonS3>();
     ```
 
-5. Profit, you now have everything you need to interface with the Amazon SDK for .NET!
+6. Profit, you now have everything you need to interface with the Amazon SDK for .NET!
     
 I have tried to make [Program.cs](Program.cs) as readable as possible to allow for copying.
