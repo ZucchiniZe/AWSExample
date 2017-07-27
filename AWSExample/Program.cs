@@ -48,13 +48,20 @@ namespace AWSExample
                 case "read":
                     await ReadFileInBucket(bucketName: args[1], key: args[2]);
                     break;
+                case "search":
+                    await SearchBucketContents(bucketName: args[1], prefix: args[2]);
+                    break;
+                case "md5":
+                    await DownloadAllAndMd5(bucketName: args[1], prefix: args[2]);
+                    break;
                 default:
-                    Console.WriteLine($"ERROR: invalid command {command}, please choose one of the following");
                     Console.WriteLine("usage:");
-                    Console.WriteLine("  read\treads a file `read <bucket> <key>`");
-                    Console.WriteLine("  create\tcreates a file `create <bucket> <key> <contents>`");
-                    Console.WriteLine("  rename\trenames a file `rename <bucket> <source> <destination>`");
-                    Console.WriteLine("  list-bucket\tlists the contents of a bucket `list-bucket <bucket>`");
+                    Console.WriteLine("  md5\t\t\tdownloads a bucket to temp dir and computes md5 for every file `md5 <bucke> <prefix>`");
+                    Console.WriteLine("  read\t\t\treads a file `read <bucket> <key>`");
+                    Console.WriteLine("  create\t\tcreates a file `create <bucket> <key> <contents>`");
+                    Console.WriteLine("  search\t\tsearches through a bucket with a specified prefix `search <bucket> <prefix>`");
+                    Console.WriteLine("  rename\t\trenames a file `rename <bucket> <source> <destination>`");
+                    Console.WriteLine("  list-bucket\t\tlists the contents of a bucket `list-bucket <bucket>`");
                     Console.WriteLine("  list-owned-buckets\tlists the buckets that you own `list-buckets`");
                     break;
             }

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography;
+using System.Threading;
 using System.Threading.Tasks;
 using Amazon.S3.Model;
 
@@ -10,9 +12,11 @@ namespace AWSExample
         private static async Task ListOwnedBuckets()
         {
             var response = await _client.ListBucketsAsync();
+            
+            Console.WriteLine("Currently owned buckets:");
             foreach (var bucket in response.Buckets)
             {
-                Console.WriteLine("You own a bucket with name: {0}", bucket.BucketName);
+                Console.WriteLine(bucket.BucketName);
             }
         }
 
@@ -23,6 +27,40 @@ namespace AWSExample
             foreach (var entry in response.S3Objects)
             {
                 Console.WriteLine($"{entry.Key}\t{entry.LastModified}");
+            }
+        }
+
+        private static async Task SearchBucketContents(string bucketName, string prefix)
+        {
+            var response = await _client.ListObjectsAsync(bucketName, prefix);
+            foreach (var entry in response.S3Objects)
+            {
+                var info = new DirectoryInfo(entry.Key);
+                Console.WriteLine($"{info.Name} {entry.Key}\t{entry.LastModified}\t{entry.ETag}");
+            }
+        }
+
+        private static async Task DownloadAllAndMd5(string bucketName, string prefix)
+        {
+            var response = await _client.ListObjectsAsync(bucketName, prefix);
+            foreach (var entry in response.S3Objects)
+            {
+                var fileResp = await _client.GetObjectAsync(bucketName, entry.Key);
+                var dest = Path.Combine(Path.GetTempPath(), entry.Key);
+                
+                if (File.Exists(dest)) File.Delete(dest);
+                
+                await fileResp.WriteResponseStreamToFileAsync(dest, false, CancellationToken.None);
+                
+                using (var md5 = MD5.Create())
+                using (var stream = File.OpenRead(dest))
+                {
+                    var hash = BitConverter.ToString(md5.ComputeHash(stream)).Replace("-", string.Empty).ToLower();
+                    var etag = fileResp.ETag.Replace("\"", string.Empty);
+                    Console.WriteLine($"file = {fileResp.Key} hash = {hash} etag = {etag} same = {hash == etag}");
+                }
+                
+                File.Delete(dest);
             }
         }
 
